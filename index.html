@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Driving Game</title>
+  <style>
+    * {
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      font-family: 'Trebuchet MS';
+    }
+
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #road {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: url('https://i.pinimg.com/originals/5b/a1/72/5ba172d8e2672d2caca285446dede657.jpg') repeat-y;
+      background-size: 100% auto;
+      animation: scrollRoad linear infinite;
+    }
+
+    #car {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(180deg);
+      width: 200px;
+      height: 300px;
+      background: url('https://png.pngtree.com/png-vector/20230408/ourmid/pngtree-white-car-top-view-vector-png-image_6681668.png');
+      z-index: 1;
+      background-size: cover;
+      background-position: center center;
+    }
+
+    @keyframes scrollRoad {
+      from {
+        background-position: 0 100%;
+      }
+      to {
+        background-position: 0 0;
+      }
+    }
+    #meter {
+    	background: #00000099;
+        padding: 15px;
+        display: inline-block;
+        color: orange;
+        border-radius: 15px;
+        position: absolute;
+        bottom: 0;
+        margin: 20px;
+    }
+    span {
+    	display: inline;
+        font-size: 35px;
+        margin-left: 15px;
+    }
+    .model {
+    	right: 0 !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div id="road">
+    	<div id="meter">SPEED (KM/H):<span ID="STAT">0</span></div>
+        <div id="meter" class="model">MODEL:<span>Mobiz CarAdvantia</span></div>
+    </div>
+    <div id="car"></div>
+  </div>
+
+  <script>
+    class Car {
+      constructor(make, model, year) {
+        this.make = make;
+        this.model = model;
+        this.year = year;
+        this.speed = 0;
+        this.intervalId = null;
+      }
+
+      accelerate() {
+        this.speed += 10;
+        console.log(`The ${this.make} ${this.model} is accelerating. Current speed: ${this.speed} km/h.`);
+        document.getElementById('STAT').innerText = this.speed;
+
+        if (this.intervalId === null) {
+          this.intervalId = setInterval(() => {
+            const roadElement = document.getElementById('road');
+            roadElement.style.animationDuration = `${20 / this.speed}s`;
+          }, 100);
+        }
+      }
+
+      brake() {
+        if (this.speed > 0) {
+          this.speed -= 10;
+          console.log(`The ${this.make} ${this.model} is braking. Current speed: ${this.speed} km/h.`);
+          document.getElementById('STAT').innerText = this.speed;
+
+          if (this.speed === 0) {
+            clearInterval(this.intervalId);
+            this.intervalId = null;
+            const roadElement = document.getElementById('road');
+            roadElement.style.animationDuration = `0s`;
+          } else {
+            const roadElement = document.getElementById('road');
+            roadElement.style.animationDuration = `${20 / this.speed}s`;
+          }
+        } else {
+          console.log(`The ${this.make} ${this.model} has already stopped.`);
+        }
+      }
+    }
+
+    // Create a car instance
+    const myCar = new Car('Mobiz', 'CarAdvantia', 2023);
+
+    // Add event listeners to control the car
+    document.addEventListener('keydown', (event) => {
+      if (event.code === 'KeyW') {
+        myCar.accelerate();
+      } else if (event.code === 'KeyS') {
+        myCar.brake();
+      }
+    });
+  </script>
+</body>
+</html>
